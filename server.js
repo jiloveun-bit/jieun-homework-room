@@ -22,6 +22,7 @@ const server = http.createServer(async (req, res) => {
       redirect: 'manual'
     });
 
+    console.log("[proxy]", req.method, req.url, "=>", upstream.status, "location=", upstream.headers.get("location") || "-", "cookie=", upstream.headers.get("set-cookie") ? "yes" : "no");
     res.statusCode = upstream.status;
 
     const loc = upstream.headers.get('location');
