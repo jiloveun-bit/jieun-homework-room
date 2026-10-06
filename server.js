@@ -32,7 +32,13 @@ const server = http.createServer(async (req, res) => {
     }
 
     const setCookie = upstream.headers.get('set-cookie');
-    if (setCookie) res.setHeader('Set-Cookie', setCookie);
+    if (setCookie) {
+      const fixedCookie = setCookie
+        .replace(/;\s*Domain=[^;]+/ig, '')
+        .replace(/;\s*Path=[^;]+/ig, '')
+        + '; Path=/; HttpOnly; Secure; SameSite=Lax';
+      res.setHeader('Set-Cookie', fixedCookie);
+    }
 
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
