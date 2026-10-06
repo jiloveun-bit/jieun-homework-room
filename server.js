@@ -40,11 +40,17 @@ const server = http.createServer(async (req, res) => {
       res.setHeader('Set-Cookie', fixedCookie);
     }
 
-    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    const upstreamType = upstream.headers.get('content-type');
+    const upstreamDisposition = upstream.headers.get('content-disposition');
+    const upstreamCache = upstream.headers.get('cache-control');
+
+    res.setHeader('Content-Type', upstreamType || 'application/octet-stream');
+    if (upstreamDisposition) res.setHeader('Content-Disposition', upstreamDisposition);
+    res.setHeader('Cache-Control', upstreamCache || 'no-store, no-cache, must-revalidate');
     res.setHeader('X-Content-Type-Options', 'nosniff');
 
     const bytes = Buffer.from(await upstream.arrayBuffer());
+    res.setHeader('Content-Length', String(bytes.length));
     res.end(bytes);
   } catch (err) {
     res.statusCode = 500;
