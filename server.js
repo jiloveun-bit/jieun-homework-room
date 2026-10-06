@@ -44,12 +44,16 @@ const server = http.createServer(async (req, res) => {
     const upstreamDisposition = upstream.headers.get('content-disposition');
     const upstreamCache = upstream.headers.get('cache-control');
 
-    const isAttachment = !!upstreamDisposition;
-    const responseType = isAttachment
-      ? (upstreamType || 'application/octet-stream')
-      : 'text/html; charset=UTF-8';
-    res.setHeader('Content-Type', responseType);
-    if (upstreamDisposition) res.setHeader('Content-Disposition', upstreamDisposition);
+    const action = incoming.searchParams.get('action') || '';
+    const isFileDownload = action === 'download_resource' || action === 'download_shared';
+
+    if (isFileDownload) {
+      res.setHeader('Content-Type', upstreamType || 'application/octet-stream');
+      if (upstreamDisposition) res.setHeader('Content-Disposition', upstreamDisposition);
+    } else {
+      res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+      res.removeHeader('Content-Disposition');
+    }
     res.setHeader('Cache-Control', upstreamCache || 'no-store, no-cache, must-revalidate');
     res.setHeader('X-Content-Type-Options', 'nosniff');
 
