@@ -44,7 +44,11 @@ const server = http.createServer(async (req, res) => {
     const upstreamDisposition = upstream.headers.get('content-disposition');
     const upstreamCache = upstream.headers.get('cache-control');
 
-    res.setHeader('Content-Type', upstreamType || 'application/octet-stream');
+    const isAttachment = !!upstreamDisposition;
+    const responseType = isAttachment
+      ? (upstreamType || 'application/octet-stream')
+      : 'text/html; charset=UTF-8';
+    res.setHeader('Content-Type', responseType);
     if (upstreamDisposition) res.setHeader('Content-Disposition', upstreamDisposition);
     res.setHeader('Cache-Control', upstreamCache || 'no-store, no-cache, must-revalidate');
     res.setHeader('X-Content-Type-Options', 'nosniff');
