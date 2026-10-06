@@ -26,7 +26,10 @@ const server = http.createServer(async (req, res) => {
     res.statusCode = upstream.status;
 
     const loc = upstream.headers.get('location');
-    if (loc) res.setHeader('Location', loc);
+    if (loc) {
+      const fixed = (loc === '/homework-room' || loc.endsWith('/homework-room')) ? '/' : loc;
+      res.setHeader('Location', fixed);
+    }
 
     const setCookie = upstream.headers.get('set-cookie');
     if (setCookie) res.setHeader('Set-Cookie', setCookie);
