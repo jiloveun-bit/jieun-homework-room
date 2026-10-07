@@ -100,4 +100,4 @@ async function handler(request: Request): Promise<Response> {
   }
 }
 
-Deno.serve(handler);
+Deno.serve({ automaticCompression: true }, handler);
