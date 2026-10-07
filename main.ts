@@ -24,6 +24,7 @@ async function handler(request: Request): Promise<Response> {
     const incoming = new URL(request.url);
     const target = new URL(TARGET);
     target.search = incoming.search;
+    target.searchParams.set("forceFunctionRegion", "ap-northeast-2");
 
     const headers = new Headers();
     for (const name of [
