@@ -7,8 +7,11 @@ export default {
       const target = new URL(TARGET);
       target.search = incoming.search;
 
-      const headers = new Headers(request.headers);
-      headers.delete("host");
+      const headers = new Headers();
+      const contentType = request.headers.get("content-type");
+      const cookie = request.headers.get("cookie");
+      if (contentType) headers.set("content-type", contentType);
+      if (cookie) headers.set("cookie", cookie);
 
       const upstream = await fetch(target.toString(), {
         method: request.method,
@@ -17,7 +20,7 @@ export default {
         redirect: "manual"
       });
 
-      const out = new Headers(upstream.headers);
+      const out = new Headers();
 
       const location = upstream.headers.get("location");
       if (location) {
@@ -54,7 +57,6 @@ export default {
         if (disposition) out.set("content-disposition", disposition);
       } else {
         out.set("content-type", "text/html; charset=UTF-8");
-        out.delete("content-disposition");
       }
 
       out.set(
@@ -63,7 +65,6 @@ export default {
           "no-store, no-cache, must-revalidate"
       );
       out.set("x-content-type-options", "nosniff");
-      out.delete("content-length");
 
       return new Response(upstream.body, {
         status: upstream.status,
