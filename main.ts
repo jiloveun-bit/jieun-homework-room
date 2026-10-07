@@ -1,4 +1,5 @@
 const TARGET = "https://uvaetmejrqclrdfromlm.supabase.co/functions/v1/homework-room";
+// proxy-build: 2026-10-07-v2
 
 function copySetCookies(from: Headers, to: Headers) {
   const h = from as Headers & { getSetCookie?: () => string[] };
@@ -78,6 +79,7 @@ async function handler(request: Request): Promise<Response> {
         "no-store, no-cache, must-revalidate",
     );
     out.set("x-content-type-options", "nosniff");
+    out.set("x-jieun-proxy-version", "2026-10-07-v2");
 
     return new Response(upstream.body, {
       status: upstream.status,
