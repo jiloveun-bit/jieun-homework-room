@@ -66,10 +66,7 @@ async function handler(request: Request): Promise<Response> {
         });
 
         const fileOut = new Headers();
-        fileOut.set(
-          "content-type",
-          fileRes.headers.get("content-type") || "application/octet-stream",
-        );
+        fileOut.set("content-type", "application/octet-stream");
         const encodedName = upstream.headers.get("x-jieun-download-name");
         if (encodedName) {
           let fileName = "download";
@@ -90,7 +87,7 @@ async function handler(request: Request): Promise<Response> {
         fileOut.set("content-transfer-encoding", "binary");
         fileOut.set("x-content-type-options", "nosniff");
         fileOut.set("x-download-options", "noopen");
-        fileOut.set("x-jieun-proxy-version", "2026-10-08-v5");
+        fileOut.set("x-jieun-proxy-version", "2026-10-08-v6");
 
         return new Response(fileRes.body, {
           status: fileRes.status,
@@ -132,7 +129,7 @@ async function handler(request: Request): Promise<Response> {
         "no-store, no-cache, must-revalidate",
     );
     out.set("x-content-type-options", "nosniff");
-    out.set("x-jieun-proxy-version", "2026-10-08-v5");
+    out.set("x-jieun-proxy-version", "2026-10-08-v6");
 
     return new Response(upstream.body, {
       status: upstream.status,
