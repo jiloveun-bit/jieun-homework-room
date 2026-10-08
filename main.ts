@@ -90,7 +90,7 @@ async function handler(request: Request): Promise<Response> {
         fileOut.set("content-transfer-encoding", "binary");
         fileOut.set("x-content-type-options", "nosniff");
         fileOut.set("x-download-options", "noopen");
-        fileOut.set("x-jieun-proxy-version", "2026-10-08-v7");
+        fileOut.set("x-jieun-proxy-version", "2026-10-08-v8");
 
         return new Response(fileRes.body, {
           status: fileRes.status,
@@ -132,7 +132,7 @@ async function handler(request: Request): Promise<Response> {
         "no-store, no-cache, must-revalidate",
     );
     out.set("x-content-type-options", "nosniff");
-    out.set("x-jieun-proxy-version", "2026-10-08-v7");
+    out.set("x-jieun-proxy-version", "2026-10-08-v8");
 
     return new Response(upstream.body, {
       status: upstream.status,
@@ -153,4 +153,4 @@ async function handler(request: Request): Promise<Response> {
   }
 }
 
-Deno.serve({ automaticCompression: true }, handler);
+Deno.serve(handler);
