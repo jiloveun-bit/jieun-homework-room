@@ -63,12 +63,20 @@ async function handler(request: Request): Promise<Response> {
       action === "download_resource" || action === "download_shared";
 
     if (isFileDownload) {
+      const ua = (request.headers.get("user-agent") || "").toLowerCase();
+      const chinaAndroid = ua.includes("android") || ua.includes("micromessenger") || ua.includes("qqbrowser");
       out.set(
         "content-type",
-        upstream.headers.get("content-type") || "application/octet-stream",
+        chinaAndroid
+          ? "application/octet-stream"
+          : (upstream.headers.get("content-type") || "application/octet-stream"),
       );
       const disposition = upstream.headers.get("content-disposition");
       if (disposition) out.set("content-disposition", disposition);
+      const len = upstream.headers.get("content-length");
+      if (len) out.set("content-length", len);
+      out.set("content-transfer-encoding", "binary");
+      out.set("x-download-options", "noopen");
     } else {
       out.set("content-type", "text/html; charset=UTF-8");
     }
@@ -79,7 +87,7 @@ async function handler(request: Request): Promise<Response> {
         "no-store, no-cache, must-revalidate",
     );
     out.set("x-content-type-options", "nosniff");
-    out.set("x-jieun-proxy-version", "2026-10-07-v2");
+    out.set("x-jieun-proxy-version", "2026-10-08-v3");
 
     return new Response(upstream.body, {
       status: upstream.status,
