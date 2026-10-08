@@ -70,15 +70,27 @@ async function handler(request: Request): Promise<Response> {
           "content-type",
           fileRes.headers.get("content-type") || "application/octet-stream",
         );
-        const disposition = fileRes.headers.get("content-disposition");
-        if (disposition) fileOut.set("content-disposition", disposition);
+        const encodedName = upstream.headers.get("x-jieun-download-name");
+        if (encodedName) {
+          let fileName = "download";
+          try { fileName = decodeURIComponent(encodedName); } catch {}
+          const extMatch = fileName.match(/(\.[A-Za-z0-9]+)$/);
+          const fallback = "download" + (extMatch?.[1] || "");
+          fileOut.set(
+            "content-disposition",
+            'attachment; filename="' + fallback + '"; filename*=UTF-8\'\'' + encodeURIComponent(fileName),
+          );
+        } else {
+          const disposition = fileRes.headers.get("content-disposition");
+          if (disposition) fileOut.set("content-disposition", disposition);
+        }
         const len = fileRes.headers.get("content-length");
         if (len) fileOut.set("content-length", len);
         fileOut.set("cache-control", "private, no-store");
         fileOut.set("content-transfer-encoding", "binary");
         fileOut.set("x-content-type-options", "nosniff");
         fileOut.set("x-download-options", "noopen");
-        fileOut.set("x-jieun-proxy-version", "2026-10-08-v4");
+        fileOut.set("x-jieun-proxy-version", "2026-10-08-v5");
 
         return new Response(fileRes.body, {
           status: fileRes.status,
@@ -120,7 +132,7 @@ async function handler(request: Request): Promise<Response> {
         "no-store, no-cache, must-revalidate",
     );
     out.set("x-content-type-options", "nosniff");
-    out.set("x-jieun-proxy-version", "2026-10-08-v4");
+    out.set("x-jieun-proxy-version", "2026-10-08-v5");
 
     return new Response(upstream.body, {
       status: upstream.status,
