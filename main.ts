@@ -46,6 +46,47 @@ async function handler(request: Request): Promise<Response> {
       redirect: "manual",
     });
 
+    const action = incoming.searchParams.get("action") || "";
+    const isFileDownload =
+      action === "download_resource" || action === "download_shared";
+
+    // For downloads, keep the browser on jieun.class.deno.net.
+    // Supabase returns a short-lived signed URL; Deno fetches it server-side
+    // so phones in mainland China never need to open supabase.co directly.
+    if (isFileDownload) {
+      const signedLocation = upstream.headers.get("location");
+      if (upstream.status >= 300 && upstream.status < 400 && signedLocation) {
+        const fileRes = await fetch(signedLocation, {
+          method: "GET",
+          redirect: "follow",
+          headers: {
+            "user-agent": request.headers.get("user-agent") || "Mozilla/5.0",
+            "accept": "*/*",
+          },
+        });
+
+        const fileOut = new Headers();
+        fileOut.set(
+          "content-type",
+          fileRes.headers.get("content-type") || "application/octet-stream",
+        );
+        const disposition = fileRes.headers.get("content-disposition");
+        if (disposition) fileOut.set("content-disposition", disposition);
+        const len = fileRes.headers.get("content-length");
+        if (len) fileOut.set("content-length", len);
+        fileOut.set("cache-control", "private, no-store");
+        fileOut.set("content-transfer-encoding", "binary");
+        fileOut.set("x-content-type-options", "nosniff");
+        fileOut.set("x-download-options", "noopen");
+        fileOut.set("x-jieun-proxy-version", "2026-10-08-v4");
+
+        return new Response(fileRes.body, {
+          status: fileRes.status,
+          headers: fileOut,
+        });
+      }
+    }
+
     const out = new Headers();
     copySetCookies(upstream.headers, out);
 
@@ -58,18 +99,10 @@ async function handler(request: Request): Promise<Response> {
       out.set("location", fixed);
     }
 
-    const action = incoming.searchParams.get("action") || "";
-    const isFileDownload =
-      action === "download_resource" || action === "download_shared";
-
     if (isFileDownload) {
-      const ua = (request.headers.get("user-agent") || "").toLowerCase();
-      const chinaAndroid = ua.includes("android") || ua.includes("micromessenger") || ua.includes("qqbrowser");
       out.set(
         "content-type",
-        chinaAndroid
-          ? "application/octet-stream"
-          : (upstream.headers.get("content-type") || "application/octet-stream"),
+        upstream.headers.get("content-type") || "application/octet-stream",
       );
       const disposition = upstream.headers.get("content-disposition");
       if (disposition) out.set("content-disposition", disposition);
@@ -87,7 +120,7 @@ async function handler(request: Request): Promise<Response> {
         "no-store, no-cache, must-revalidate",
     );
     out.set("x-content-type-options", "nosniff");
-    out.set("x-jieun-proxy-version", "2026-10-08-v3");
+    out.set("x-jieun-proxy-version", "2026-10-08-v4");
 
     return new Response(upstream.body, {
       status: upstream.status,
