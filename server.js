@@ -58,7 +58,7 @@ const server = http.createServer(async (req, res) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
 
     let bytes = Buffer.from(await upstream.arrayBuffer());
-    if (!isFileDownload && (upstreamType || '').includes('text/html')) {
+    if (!isFileDownload && (upstreamType || '').toLowerCase().includes('html') || (!isFileDownload && bytes.subarray(0,300).toString('utf8').toLowerCase().includes('<!doctype html'))) {
       let html = bytes.toString('utf8');
       const uiPatch = `<script>
 document.addEventListener('DOMContentLoaded',function(){
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded',function(){
   if(today&&vocab&&today.previousElementSibling!==vocab)today.parentNode.insertBefore(vocab,today);
 });
 </script>`;
-      if (html.includes('</body>')) html = html.replace('</body>', uiPatch + '</body>');
+      if (/<\\/body\\s*>/i.test(html)) html = html.replace(/<\\/body\\s*>/i, uiPatch + '</body>'); else html += uiPatch;
       bytes = Buffer.from(html, 'utf8');
     }
     res.setHeader('Content-Length', String(bytes.length));
