@@ -210,18 +210,24 @@ document.addEventListener('DOMContentLoaded',function(){
   const today=document.querySelector('.studentTabbed');
   const vocab=document.getElementById('studentVocabPanel');
   if(today&&vocab&&today.previousElementSibling!==vocab)today.parentNode.insertBefore(vocab,today);
-  // Make only the student's vocabulary test records visually distinct.
+  // Style the closed header only; leave the expanded test records untouched.
   if(vocab){
     vocab.style.setProperty('background','#ffffff','important');
-    vocab.style.setProperty('border','2px solid #ed9ab7','important');
-    vocab.style.setProperty('border-radius','18px','important');
-    vocab.style.setProperty('padding','18px','important');
-    vocab.style.setProperty('box-shadow','0 4px 18px rgba(191,68,113,.09)','important');
-    vocab.style.setProperty('color','#493746','important');
-    const headings=vocab.querySelectorAll('h2,h3,h4,.sectionTitle,.panelTitle');
-    headings.forEach(el=>{el.style.setProperty('color','#a82f63','important');el.style.setProperty('font-weight','800','important')});
-    vocab.querySelectorAll('.muted,small').forEach(el=>el.style.setProperty('color','#795b6d','important'));
-    vocab.querySelectorAll('strong,b').forEach(el=>el.style.setProperty('color','#8f2c58','important'));
+    vocab.style.setProperty('border','2px solid #e79ab9','important');
+    vocab.style.setProperty('border-radius','16px','important');
+    vocab.style.setProperty('padding','15px','important');
+    vocab.style.setProperty('box-shadow','0 3px 12px rgba(177,57,105,.055)','important');
+    const summary=vocab.querySelector(':scope > summary');
+    if(summary){
+      summary.style.setProperty('background','#ffffff','important');
+      summary.style.setProperty('border-radius','12px','important');
+      const heading=summary.querySelector('span');
+      if(heading)heading.style.setProperty('color','#a63465','important');
+      const arrow=summary.querySelectorAll('span')[2]||summary.lastElementChild;
+      if(arrow)arrow.style.setProperty('color','#b54f7d','important');
+      const hint=summary.querySelector('small');
+      if(hint)hint.style.setProperty('color','#975e77','important');
+    }
   }
 });
 </script>`;
