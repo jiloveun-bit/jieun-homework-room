@@ -45,7 +45,7 @@ const server = http.createServer(async (req, res) => {
     const upstreamCache = upstream.headers.get('cache-control');
 
     const action = incoming.searchParams.get('action') || '';
-    const isFileDownload = action === 'download_resource' || action === 'download_shared';
+    const isFileDownload = action === 'download_resource' || action === 'download_shared' || action === 'library_download';
 
     if (isFileDownload) {
       res.setHeader('Content-Type', upstreamType || 'application/octet-stream');
