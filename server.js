@@ -68,8 +68,8 @@ document.addEventListener('DOMContentLoaded',function(){
     const times=[...attendance.querySelectorAll('.attendanceTime')].map(e=>e.textContent.trim());
     const unique=[...new Set(times)];
     const top=document.createElement('div');
-    top.style.cssText='font-size:14px;font-weight:800;color:#405f7d;margin-bottom:10px;line-height:1.6';
-    top.textContent='🕒 今日课程时间 / 오늘의 수업시간: '+(unique.length?unique.join(' · '):'暂无课程 / 수업 없음');
+    top.style.cssText='display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fff5c4;border:1px solid #f4de88;border-radius:14px;padding:12px 14px;font-size:15px;font-weight:850;color:#745500;margin-bottom:12px;line-height:1.6';
+    top.textContent='🕒 今日课程时间 · 오늘의 수업시간  '+(unique.length?unique.join(' · '):'暂无课程 / 수업 없음');
     attendance.insertBefore(top,attendance.firstChild);
     const details=document.createElement('details');
     details.style.cssText='border-top:1px solid #e8e0f4;padding-top:10px';
@@ -78,15 +78,16 @@ document.addEventListener('DOMContentLoaded',function(){
     summary.textContent='🩵 出勤确认 / 출석 체크 · 点击展开申报缺勤';
     details.appendChild(summary);
     const advance=document.getElementById('studentAbsenceCard');
-    if(advance)details.appendChild(advance);
+    if(advance)advance.remove();
     const heading=attendance.querySelector('h3');
     if(heading)heading.remove();
     while(top.nextSibling) details.appendChild(top.nextSibling);
     attendance.appendChild(details);
   }
   const count=document.getElementById('studentAbsenceCount');
+  if(count)count.remove();
   const homework=document.getElementById('studentVocabHomeworkCard');
-  if(count&&homework)homework.insertAdjacentElement('afterend',count);
+  
   const today=document.querySelector('.studentTabbed');
   const vocab=document.getElementById('studentVocabPanel');
   if(today&&vocab&&today.previousElementSibling!==vocab)today.parentNode.insertBefore(vocab,today);
