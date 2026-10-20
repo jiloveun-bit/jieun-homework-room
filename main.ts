@@ -167,6 +167,30 @@ document.addEventListener('DOMContentLoaded',function(){
         lesson.style.cssText='border:0!important;border-top:1px solid #e8edf3!important;border-radius:0!important;background:transparent!important;padding:14px 0 0!important;margin:0!important;box-shadow:none!important';
         const duplicate=lesson.querySelector('.attendanceLessonTitle');
         if(duplicate)duplicate.remove();
+        const layout=lesson.querySelector('div[style*="grid-template-columns:1fr 1fr"]');
+        if(layout){
+          layout.style.cssText='display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;width:100%;align-items:start';
+          const present=layout.querySelector(':scope > form');
+          const absent=layout.querySelector(':scope > details');
+          if(present)present.style.cssText='margin:0;min-width:0';
+          if(absent){
+            absent.style.cssText='grid-column:2;min-width:0;margin:0';
+            const summary=absent.querySelector('summary');
+            if(summary)summary.style.cssText+=';display:flex;justify-content:center;align-items:center;min-height:48px;width:100%;padding:10px 4px';
+            const reasonForm=absent.querySelector('form');
+            if(reasonForm){
+              reasonForm.style.cssText='grid-column:1 / -1;box-sizing:border-box;width:100%;min-width:0;margin:0;padding:14px;background:#f8fafc;border:1px solid #e3e9ee;border-radius:12px;display:none';
+              layout.appendChild(reasonForm);
+              const toggle=()=>{reasonForm.style.display=absent.open?'block':'none'};
+              absent.addEventListener('toggle',toggle);
+              toggle();
+              const text=reasonForm.querySelector('textarea');
+              if(text)text.style.cssText='box-sizing:border-box;width:100%;min-width:0;min-height:90px;display:block';
+              const pb=present?.querySelector('button');
+              if(pb)pb.addEventListener('click',()=>{absent.open=false;reasonForm.style.display='none'},true);
+            }
+          }
+        }
         card.appendChild(lesson);
       }
       wrapper.appendChild(card);
