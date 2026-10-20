@@ -235,17 +235,17 @@ document.addEventListener('DOMContentLoaded',function(){
   if(today&&!today.closest('#studentTodayFold')){
     const fold=document.createElement('details');
     fold.id='studentTodayFold';
-    fold.style.cssText='background:#fff;border:1px solid #dac8e8;border-radius:16px;padding:15px;box-shadow:0 2px 8px rgba(103,69,145,.025);margin:0 0 12px';
+    fold.style.cssText='background:#fff;border:1px solid #d9e3ee;border-radius:16px;padding:15px;box-shadow:0 2px 8px rgba(32,53,77,.035);margin:0 0 12px';
     const head=document.createElement('summary');
     head.style.cssText='list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px;touch-action:manipulation';
     const title=document.createElement('span');
-    title.style.cssText='font-size:17px;font-weight:850;color:#775196';
+    title.style.cssText='font-size:17px;font-weight:850;color:#253449';
     title.textContent='📚 今日学习';
     const hint=document.createElement('span');
-    hint.style.cssText='font-size:12px;font-weight:550;color:#9780ad';
+    hint.style.cssText='font-size:12px;font-weight:550;color:#68788b';
     hint.textContent='点击展开查看';
     const arrow=document.createElement('span');
-    arrow.style.cssText='font-size:21px;color:#9777b1';
+    arrow.style.cssText='font-size:21px;color:#446b91';
     arrow.textContent='⌄';
     const right=document.createElement('span');
     right.style.cssText='display:flex;align-items:center;gap:9px';
@@ -279,37 +279,26 @@ document.addEventListener('DOMContentLoaded',function(){
   // Style the closed header only; leave the expanded test records untouched.
   if(vocab){
     vocab.style.setProperty('background','#ffffff','important');
-    vocab.style.setProperty('border','1px solid #dac8e8','important');
+    vocab.style.setProperty('border','1px solid #d9e3ee','important');
     vocab.style.setProperty('border-radius','16px','important');
     vocab.style.setProperty('padding','15px','important');
-    vocab.style.setProperty('box-shadow','0 2px 8px rgba(103,69,145,.025)','important');
+    vocab.style.setProperty('box-shadow','0 2px 8px rgba(32,53,77,.035)','important');
     const summary=vocab.querySelector(':scope > summary');
     if(summary){
       summary.style.setProperty('background','#ffffff','important');
       summary.style.setProperty('border-radius','12px','important');
       const heading=summary.querySelector('span');
-      if(heading)heading.style.setProperty('color','#775196','important');
+      if(heading)heading.style.setProperty('color','#253449','important');
       const arrow=summary.querySelectorAll('span')[2]||summary.lastElementChild;
-      if(arrow)arrow.style.setProperty('color','#9777b1','important');
+      if(arrow)arrow.style.setProperty('color','#446b91','important');
       const hint=summary.querySelector('small');
-      if(hint)hint.style.setProperty('color','#9780ad','important');
+      if(hint)hint.style.setProperty('color','#68788b','important');
     }
   }
 });
 </script>`;
       html = html.replaceAll("정상 출석이면 체크하지 않아도 돼요. / 正常出席无需操作", "正常出席无需操作").replaceAll("정상 출석이면 체크하지 않아도 돼요.", "正常出席无需操作");
       html = html.replaceAll("이미 입력된 테스트입니다. 수정하시겠습니까?", "该学生的本次考试成绩已录入，确定要修改吗？");
-      // Split the two cards at the HTML source, before DOM scripts execute.
-      // The original markup nests vocab records inside .studentTabbed by mistake.
-      const vocabStart = "<details id='studentVocabPanel'";
-      const idx = html.indexOf(vocabStart);
-      if (idx >= 0) {
-        const closeAt = html.indexOf("</div></details></div>", idx);
-        if (closeAt >= 0 && html.slice(Math.max(0,idx-800),idx).includes("</style>")) {
-          html = html.slice(0,idx) + "</div>" + html.slice(idx,closeAt)
-            + html.slice(closeAt).replace("</div></details></div>","</div></details>");
-        }
-      }
       html = /<\/body>/i.test(html) ? html.replace(/<\/body>/i, uiPatch + "</body>") : html + uiPatch;
       out.delete("content-length");
       return new Response(html, { status: upstream.status, headers: out });
