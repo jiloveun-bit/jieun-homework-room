@@ -299,6 +299,17 @@ document.addEventListener('DOMContentLoaded',function(){
 </script>`;
       html = html.replaceAll("정상 출석이면 체크하지 않아도 돼요. / 正常出席无需操作", "正常出席无需操作").replaceAll("정상 출석이면 체크하지 않아도 돼요.", "正常出席无需操作");
       html = html.replaceAll("이미 입력된 테스트입니다. 수정하시겠습니까?", "该学生的本次考试成绩已录入，确定要修改吗？");
+      // Split the two cards at the HTML source, before DOM scripts execute.
+      // The original markup nests vocab records inside .studentTabbed by mistake.
+      const vocabStart = "<details id='studentVocabPanel'";
+      const idx = html.indexOf(vocabStart);
+      if (idx >= 0) {
+        const closeAt = html.indexOf("</div></details></div>", idx);
+        if (closeAt >= 0 && html.slice(Math.max(0,idx-800),idx).includes("</style>")) {
+          html = html.slice(0,idx) + "</div>" + html.slice(idx,closeAt)
+            + html.slice(closeAt).replace("</div></details></div>","</div></details>");
+        }
+      }
       html = /<\/body>/i.test(html) ? html.replace(/<\/body>/i, uiPatch + "</body>") : html + uiPatch;
       out.delete("content-length");
       return new Response(html, { status: upstream.status, headers: out });
