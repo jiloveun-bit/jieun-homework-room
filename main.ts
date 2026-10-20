@@ -266,15 +266,26 @@ document.addEventListener('DOMContentLoaded',function(){
     // Records are a sibling of the Today fold, not one of its contents.
     if(vocab){fold.insertAdjacentElement('afterend',vocab);vocab.hidden=false;vocab.removeAttribute('open');vocab.style.removeProperty('display');}
   }
-  // Keep the vocabulary records visible even when the study fold is closed.
-  if(vocab){
-    const fold=document.getElementById('studentTodayFold');
-    if(fold&&vocab.closest('#studentTodayFold'))fold.insertAdjacentElement('afterend',vocab);
-    if(fold&&vocab.previousElementSibling!==fold)fold.insertAdjacentElement('afterend',vocab);
-    vocab.hidden=false;
-    vocab.style.setProperty('display','block','important');
-    vocab.removeAttribute('aria-hidden');
-    vocab.removeAttribute('open');
+  // The two accordion cards must be siblings in a permanent standalone mount.
+  const todayFold=document.getElementById('studentTodayFold');
+  if(todayFold){
+    let slot=document.getElementById('standaloneVocabSlot');
+    if(!slot){
+      slot=document.createElement('div');
+      slot.id='standaloneVocabSlot';
+      slot.style.cssText='display:block;width:100%;margin:12px 0';
+      todayFold.insertAdjacentElement('afterend',slot);
+    }
+    const record=document.getElementById('studentVocabPanel');
+    if(record){
+      slot.appendChild(record);
+      record.hidden=false;
+      record.removeAttribute('open');
+      record.removeAttribute('aria-hidden');
+      record.style.setProperty('display','block','important');
+      record.style.setProperty('visibility','visible','important');
+      record.style.setProperty('margin','0','important');
+    }
   }
   // Style the closed header only; leave the expanded test records untouched.
   if(vocab){
