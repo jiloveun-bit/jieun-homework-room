@@ -65,24 +65,60 @@ document.addEventListener('DOMContentLoaded',function(){
   const attendance=document.querySelector('.studentAttendanceCard');
   if(attendance&&!attendance.dataset.compact){
     attendance.dataset.compact='1';
-    const times=[...attendance.querySelectorAll('.attendanceTime')].map(e=>e.textContent.trim());
-    const unique=[...new Set(times)];
-    const top=document.createElement('div');
-    top.style.cssText='display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fff5c4;border:1px solid #f4de88;border-radius:14px;padding:12px 14px;font-size:15px;font-weight:850;color:#745500;margin-bottom:12px;line-height:1.6';
-    top.textContent='🕒 今日课程时间 · 오늘의 수업시간  '+(unique.length?unique.join(' · '):'暂无课程 / 수업 없음');
-    attendance.insertBefore(top,attendance.firstChild);
-    const details=document.createElement('details');
-    details.style.cssText='border-top:1px solid #e8e0f4;padding-top:10px';
-    const summary=document.createElement('summary');
-    summary.style.cssText='cursor:pointer;font-size:16px;font-weight:850';
-    summary.textContent='🩵 出勤确认 / 출석 체크 · 点击展开申报缺勤';
-    details.appendChild(summary);
+    const timeNodes=[...attendance.querySelectorAll('.attendanceTime')];
+    const times=timeNodes.map(e=>e.textContent.trim());
+    const hasAfternoon=times.some(t=>/13[:：]30|下午|오후/.test(t));
+    const hasEvening=times.some(t=>/18[:：]30|晚上|晚间|저녁/.test(t));
+    const oldHeading=attendance.querySelector('h3');
+    if(oldHeading)oldHeading.remove();
     const advance=document.getElementById('studentAbsenceCard');
     if(advance)advance.remove();
-    const heading=attendance.querySelector('h3');
-    if(heading)heading.remove();
-    while(top.nextSibling) details.appendChild(top.nextSibling);
-    attendance.appendChild(details);
+    const wrapper=document.createElement('div');
+    wrapper.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:12px;margin-bottom:12px';
+    const existing=document.createElement('div');
+    while(attendance.firstChild)existing.appendChild(attendance.firstChild);
+    const buildSlot=(period,active,timeLabel)=>{
+      const card=document.createElement('div');
+      card.style.cssText='background:#fff5c4;border:1px solid #f4de88;border-radius:14px;padding:12px 14px;color:#745500';
+      const title=document.createElement('div');
+      title.style.cssText='font-size:16px;font-weight:850;margin-bottom:10px';
+      title.textContent=active?'🕒 '+timeLabel:(period==='pm'?'☀️ 下午无课':'🌙 晚上无课');
+      card.appendChild(title);
+      const details=document.createElement('details');
+      details.style.cssText='border-top:1px solid #e7d88d;padding-top:9px';
+      const summary=document.createElement('summary');
+      summary.style.cssText='cursor:pointer;font-size:14px;font-weight:750;line-height:1.55';
+      summary.textContent='请假或缺席的同学，请展开这里 / 결석하는 학생은 여기를 펼쳐 주세요';
+      details.appendChild(summary);
+      if(!active){
+        details.removeAttribute('open');
+        const msg=document.createElement('div');
+        msg.style.cssText='font-size:13px;margin-top:8px';
+        msg.textContent='今天没有这节课 / 오늘은 이 수업이 없습니다';
+        details.appendChild(msg);
+      }
+      card.appendChild(details);
+      wrapper.appendChild(card);
+      return details;
+    };
+    const afternoon=buildSlot('pm',hasAfternoon,'13:30 下午课');
+    const evening=buildSlot('eve',hasEvening,'18:30 晚课');
+    // Keep the existing attendance tools intact; never clone forms or break event listeners.
+    if(hasAfternoon&&!hasEvening)afternoon.appendChild(existing);
+    else if(hasEvening&&!hasAfternoon)evening.appendChild(existing);
+    else if(hasAfternoon&&hasEvening){
+      const blocks=[...existing.children];
+      let moved=0;
+      blocks.forEach(el=>{
+        const t=(el.textContent||'').slice(0,300);
+        const pm=/13[:：]30/.test(t), ev=/18[:：]30/.test(t);
+        if(pm&&!ev){afternoon.appendChild(el);moved++}
+        else if(ev&&!pm){evening.appendChild(el);moved++}
+      });
+      // Unclassified shared attendance controls remain visible in the evening panel.
+      if(existing.childNodes.length)evening.appendChild(existing);
+    } else evening.appendChild(existing);
+    attendance.appendChild(wrapper);
   }
   const count=document.getElementById('studentAbsenceCount');
   if(count)count.remove();
