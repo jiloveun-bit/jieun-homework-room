@@ -135,9 +135,9 @@ async function handler(request: Request): Promise<Response> {
     out.set("x-jieun-proxy-version", "2026-10-08-v8");
 
     // Apply the same attendance layout to the actual Deno-operated student site.
-    if (!isFileDownload && upstream.status === 200 &&
-        (upstream.headers.get("content-type") || "").toLowerCase().includes("html")) {
+    if (!isFileDownload && upstream.status === 200 && request.method === "GET") {
       let html = await upstream.text();
+      if (/<(?:!doctype\s+html|html|body)(?:\s|>)/i.test(html)) {
       const uiPatch = `<script>
 document.addEventListener('DOMContentLoaded',function(){
   const attendance=document.querySelector('.studentAttendanceCard');
@@ -207,8 +207,10 @@ document.addEventListener('DOMContentLoaded',function(){
   if(today&&vocab&&today.previousElementSibling!==vocab)today.parentNode.insertBefore(vocab,today);
 });
 </script>`;
-      html = html.replace(/<\/body>/i, uiPatch + "</body>");
+      html = /<\/body>/i.test(html) ? html.replace(/<\/body>/i, uiPatch + "</body>") : html + uiPatch;
       out.delete("content-length");
+      return new Response(html, { status: upstream.status, headers: out });
+      }
       return new Response(html, { status: upstream.status, headers: out });
     }
 
