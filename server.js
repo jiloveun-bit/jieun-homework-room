@@ -57,7 +57,42 @@ const server = http.createServer(async (req, res) => {
     res.setHeader('Cache-Control', upstreamCache || 'no-store, no-cache, must-revalidate');
     res.setHeader('X-Content-Type-Options', 'nosniff');
 
-    const bytes = Buffer.from(await upstream.arrayBuffer());
+    let bytes = Buffer.from(await upstream.arrayBuffer());
+    if (!isFileDownload && (upstreamType || '').includes('text/html')) {
+      let html = bytes.toString('utf8');
+      const uiPatch = `<script>
+document.addEventListener('DOMContentLoaded',function(){
+  const attendance=document.querySelector('.studentAttendanceCard');
+  if(attendance&&!attendance.dataset.compact){
+    attendance.dataset.compact='1';
+    const times=[...attendance.querySelectorAll('.attendanceTime')].map(e=>e.textContent.trim());
+    const unique=[...new Set(times)];
+    const top=document.createElement('div');
+    top.style.cssText='font-size:14px;font-weight:800;color:#405f7d;margin-bottom:10px;line-height:1.6';
+    top.textContent='🕒 今日课程时间 / 오늘의 수업시간: '+(unique.length?unique.join(' · '):'暂无课程 / 수업 없음');
+    attendance.insertBefore(top,attendance.firstChild);
+    const details=document.createElement('details');
+    details.style.cssText='border-top:1px solid #e8e0f4;padding-top:10px';
+    const summary=document.createElement('summary');
+    summary.style.cssText='cursor:pointer;font-size:16px;font-weight:850';
+    summary.textContent='🩵 出勤确认 / 출석 체크 · 点击展开申报缺勤';
+    details.appendChild(summary);
+    const heading=attendance.querySelector('h3');
+    if(heading)heading.remove();
+    while(top.nextSibling) details.appendChild(top.nextSibling);
+    attendance.appendChild(details);
+  }
+  const count=document.getElementById('studentAbsenceCount');
+  const homework=document.getElementById('studentVocabHomeworkCard');
+  if(count&&homework)homework.insertAdjacentElement('afterend',count);
+  const today=document.querySelector('.studentTabbed');
+  const vocab=document.getElementById('studentVocabPanel');
+  if(today&&vocab&&today.previousElementSibling!==vocab)today.parentNode.insertBefore(vocab,today);
+});
+</script>`;
+      if (html.includes('</body>')) html = html.replace('</body>', uiPatch + '</body>');
+      bytes = Buffer.from(html, 'utf8');
+    }
     res.setHeader('Content-Length', String(bytes.length));
     res.end(bytes);
   } catch (err) {
