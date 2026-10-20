@@ -143,65 +143,43 @@ document.addEventListener('DOMContentLoaded',function(){
   const attendance=document.querySelector('.studentAttendanceCard');
   if(attendance&&!attendance.dataset.compact){
     attendance.dataset.compact='1';
-    const timeNodes=[...attendance.querySelectorAll('.attendanceTime')];
-    const times=timeNodes.map(e=>e.textContent.trim());
-    const hasAfternoon=times.some(t=>/13[:：]30|下午|오후/.test(t));
-    const hasEvening=times.some(t=>/18[:：]30|晚上|晚间|저녁/.test(t));
+    const lessons=[...attendance.querySelectorAll('.attendanceLesson')];
+    const intro=attendance.querySelector('.attendanceIntro');
+    if(intro)intro.remove();
     const oldHeading=attendance.querySelector('h3');
     if(oldHeading)oldHeading.remove();
     const advance=document.getElementById('studentAbsenceCard');
     if(advance)advance.remove();
     const wrapper=document.createElement('div');
-    wrapper.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px;margin:4px 0 14px';
-    const existing=document.createElement('div');
-    while(attendance.firstChild)existing.appendChild(attendance.firstChild);
-    const buildSlot=(period,active,timeLabel)=>{
-      const card=document.createElement('div');
-      card.style.cssText='background:'+(active?'#ffffff':'#f8fafc')+';border:1px solid '+(active?'#d8e3ef':'#e5e9ef')+';border-radius:18px;padding:18px;color:#253449;box-shadow:0 3px 15px rgba(32,53,77,.035);min-width:0';
-      const title=document.createElement('div');
-      title.style.cssText='font-size:20px;letter-spacing:-.35px;font-weight:800;margin-bottom:14px;line-height:1.45';
-      title.textContent=active?timeLabel:(period==='pm'?'下午无课':'晚上无课');
+    wrapper.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px;align-items:stretch';
+    const buildSlot=(period,time)=>{
+      const lesson=lessons.find(el=>(el.querySelector('.attendanceTime')?.textContent||'').includes(time));
+      const card=document.createElement('section');
+      card.style.cssText='background:#fff;border:1px solid #d9e3ee;border-radius:18px;padding:18px;min-width:0;display:flex;flex-direction:column;gap:8px';
       const label=document.createElement('div');
-      label.style.cssText='font-size:12px;font-weight:750;letter-spacing:.6px;margin-bottom:5px;color:'+(active?'#446b91':'#8993a1');
+      label.style.cssText='font-size:13px;font-weight:750;color:#446b91';
       label.textContent=period==='pm'?'下午':'晚上';
-      card.appendChild(label);
-      card.appendChild(title);
-      const details=document.createElement('details');
-      details.style.cssText='border-top:1px solid #e8edf3;padding-top:12px';
-      const summary=document.createElement('summary');
-      summary.style.cssText='cursor:pointer;font-size:13px;font-weight:650;line-height:1.6;color:#426587;padding:2px 0;touch-action:manipulation';
-      summary.textContent='请假或缺席的同学，请点击展开';
-      details.appendChild(summary);
-      if(!active){
-        details.removeAttribute('open');
-        const msg=document.createElement('div');
-        msg.style.cssText='font-size:12px;color:#7c8795;margin-top:9px';
-        msg.textContent='今天没有这节课';
-        details.appendChild(msg);
+      const heading=document.createElement('div');
+      heading.style.cssText='font-size:22px;font-weight:800;line-height:1.4;color:#253449;margin:0 0 9px';
+      heading.textContent=lesson?(time+' · '+(period==='pm'?'下午课':'晚课')):(period==='pm'?'下午无课':'晚上无课');
+      card.appendChild(label);card.appendChild(heading);
+      if(lesson){
+        lesson.style.cssText='border:0!important;border-top:1px solid #e8edf3!important;border-radius:0!important;background:transparent!important;padding:14px 0 0!important;margin:0!important;box-shadow:none!important';
+        const duplicate=lesson.querySelector('.attendanceLessonTitle');
+        if(duplicate)duplicate.remove();
+        card.appendChild(lesson);
       }
-      card.appendChild(details);
       wrapper.appendChild(card);
-      return details;
     };
-    attendance.style.cssText='border:1px solid #edf1f5;border-radius:20px;background:#fff;padding:16px;box-shadow:0 5px 20px rgba(28,45,66,.035)';
-    const afternoon=buildSlot('pm',hasAfternoon,'13:30 · 下午课');
-    const evening=buildSlot('eve',hasEvening,'18:30 · 晚课');
-    // Keep the existing attendance tools intact; never clone forms or break event listeners.
-    if(hasAfternoon&&!hasEvening)afternoon.appendChild(existing);
-    else if(hasEvening&&!hasAfternoon)evening.appendChild(existing);
-    else if(hasAfternoon&&hasEvening){
-      const blocks=[...existing.children];
-      let moved=0;
-      blocks.forEach(el=>{
-        const t=(el.textContent||'').slice(0,300);
-        const pm=/13[:：]30/.test(t), ev=/18[:：]30/.test(t);
-        if(pm&&!ev){afternoon.appendChild(el);moved++}
-        else if(ev&&!pm){evening.appendChild(el);moved++}
-      });
-      // Unclassified shared attendance controls remain visible in the evening panel.
-      if(existing.childNodes.length)evening.appendChild(existing);
-    } else evening.appendChild(existing);
-    attendance.appendChild(wrapper);
+    buildSlot('pm','13:30');
+    buildSlot('eve','18:30');
+    attendance.querySelectorAll('.attendanceLesson').forEach(el=>el.remove());
+    attendance.replaceChildren(wrapper);
+    attendance.style.cssText='border:0;background:transparent;padding:0;box-shadow:none';
+    const note=document.createElement('div');
+    note.style.cssText='font-size:12px;color:#68788b;line-height:1.55;padding:10px 3px 2px';
+    note.textContent='ⓘ 课程开始10分钟后不可修改出勤状态。';
+    attendance.appendChild(note);
   }
   const count=document.getElementById('studentAbsenceCount');
   if(count)count.remove();
