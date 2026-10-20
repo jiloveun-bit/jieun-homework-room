@@ -213,20 +213,20 @@ document.addEventListener('DOMContentLoaded',function(){
   // Style the closed header only; leave the expanded test records untouched.
   if(vocab){
     vocab.style.setProperty('background','#ffffff','important');
-    vocab.style.setProperty('border','2px solid #e79ab9','important');
+    vocab.style.setProperty('border','1px solid #eac8d6','important');
     vocab.style.setProperty('border-radius','16px','important');
     vocab.style.setProperty('padding','15px','important');
-    vocab.style.setProperty('box-shadow','0 3px 12px rgba(177,57,105,.055)','important');
+    vocab.style.setProperty('box-shadow','0 2px 8px rgba(177,57,105,.025)','important');
     const summary=vocab.querySelector(':scope > summary');
     if(summary){
       summary.style.setProperty('background','#ffffff','important');
       summary.style.setProperty('border-radius','12px','important');
       const heading=summary.querySelector('span');
-      if(heading)heading.style.setProperty('color','#a63465','important');
+      if(heading)heading.style.setProperty('color','#945875','important');
       const arrow=summary.querySelectorAll('span')[2]||summary.lastElementChild;
-      if(arrow)arrow.style.setProperty('color','#b54f7d','important');
+      if(arrow)arrow.style.setProperty('color','#a88093','important');
       const hint=summary.querySelector('small');
-      if(hint)hint.style.setProperty('color','#975e77','important');
+      if(hint)hint.style.setProperty('color','#987e8a','important');
     }
   }
 });
