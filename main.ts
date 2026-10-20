@@ -140,8 +140,19 @@ async function handler(request: Request): Promise<Response> {
       if (/<(?:!doctype\s+html|html|body)(?:\s|>)/i.test(html)) {
       const uiPatch = `<script>
 document.addEventListener('DOMContentLoaded',function(){
+  // Move the records out of the study container BEFORE any folding logic runs.
+  try{
+    const study=document.querySelector('.studentTabbed'),records=document.getElementById('studentVocabPanel');
+    if(study&&records){
+      study.insertAdjacentElement('afterend',records);
+      records.hidden=false;
+      records.style.setProperty('display','block','important');
+    }
+  }catch(e){console.error('vocab relocation',e)}
+});
+document.addEventListener('DOMContentLoaded',function(){
   const attendance=document.querySelector('.studentAttendanceCard');
-  if(attendance&&!attendance.dataset.compact){
+  try { if(attendance&&!attendance.dataset.compact){
     attendance.dataset.compact='1';
     const lessons=[...attendance.querySelectorAll('.attendanceLesson')];
     const intro=attendance.querySelector('.attendanceIntro');
@@ -195,6 +206,12 @@ document.addEventListener('DOMContentLoaded',function(){
             }
           }
         }
+        if(lesson.querySelector('.majorClash')){
+          // A conflicting class uses the special attendance confirmation controls only.
+          // Do not render a second contradictory default attendance choice.
+          const selector=lesson.querySelector('div[style*="grid-template-columns:1fr 1fr"]');
+          if(selector)selector.style.setProperty('display','none','important');
+        }
         card.appendChild(lesson);
       }
       wrapper.appendChild(card);
@@ -208,7 +225,7 @@ document.addEventListener('DOMContentLoaded',function(){
     note.style.cssText='font-size:12px;color:#68788b;line-height:1.55;padding:10px 3px 2px';
     note.textContent='ⓘ 课程开始10分钟后不可修改出勤状态。';
     attendance.appendChild(note);
-  }
+  }}catch(e){console.error('attendance layout',e)}
   const count=document.getElementById('studentAbsenceCount');
   if(count)count.remove();
   const homework=document.getElementById('studentVocabHomeworkCard');
