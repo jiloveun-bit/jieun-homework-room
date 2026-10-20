@@ -235,17 +235,17 @@ document.addEventListener('DOMContentLoaded',function(){
   if(today&&!today.closest('#studentTodayFold')){
     const fold=document.createElement('details');
     fold.id='studentTodayFold';
-    fold.style.cssText='background:#fff;border:1px solid #d9c8ed;border-radius:16px;padding:15px;box-shadow:0 2px 8px rgba(103,74,154,.035);margin:0 0 12px';
+    fold.style.cssText='background:#fff;border:1px solid #dac8e8;border-radius:16px;padding:15px;box-shadow:0 2px 8px rgba(103,69,145,.025);margin:0 0 12px';
     const head=document.createElement('summary');
     head.style.cssText='list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px;touch-action:manipulation';
     const title=document.createElement('span');
-    title.style.cssText='font-size:17px;font-weight:850;color:#7655a1';
+    title.style.cssText='font-size:17px;font-weight:850;color:#775196';
     title.textContent='📚 今日学习';
     const hint=document.createElement('span');
-    hint.style.cssText='font-size:12px;font-weight:550;color:#8a79a7';
+    hint.style.cssText='font-size:12px;font-weight:550;color:#9780ad';
     hint.textContent='点击展开查看';
     const arrow=document.createElement('span');
-    arrow.style.cssText='font-size:21px;color:#9478b8';
+    arrow.style.cssText='font-size:21px;color:#9777b1';
     arrow.textContent='⌄';
     const right=document.createElement('span');
     right.style.cssText='display:flex;align-items:center;gap:9px';
@@ -263,7 +263,8 @@ document.addEventListener('DOMContentLoaded',function(){
     parent.insertBefore(fold,today);
     fold.appendChild(today);
     fold.addEventListener('toggle',()=>{hint.textContent=fold.open?'点击收起':'点击展开查看';arrow.textContent=fold.open?'⌃':'⌄'});
-    if(vocab){fold.insertAdjacentElement('afterend',vocab);vocab.hidden=false;vocab.style.removeProperty('display');}
+    // Records are a sibling of the Today fold, not one of its contents.
+    if(vocab){fold.insertAdjacentElement('afterend',vocab);vocab.hidden=false;vocab.removeAttribute('open');vocab.style.removeProperty('display');}
   }
   // Keep the vocabulary records visible even when the study fold is closed.
   if(vocab){
@@ -273,24 +274,25 @@ document.addEventListener('DOMContentLoaded',function(){
     vocab.hidden=false;
     vocab.style.setProperty('display','block','important');
     vocab.removeAttribute('aria-hidden');
+    vocab.removeAttribute('open');
   }
   // Style the closed header only; leave the expanded test records untouched.
   if(vocab){
     vocab.style.setProperty('background','#ffffff','important');
-    vocab.style.setProperty('border','1px solid #d9c8ed','important');
+    vocab.style.setProperty('border','1px solid #dac8e8','important');
     vocab.style.setProperty('border-radius','16px','important');
     vocab.style.setProperty('padding','15px','important');
-    vocab.style.setProperty('box-shadow','0 2px 8px rgba(103,74,154,.035)','important');
+    vocab.style.setProperty('box-shadow','0 2px 8px rgba(103,69,145,.025)','important');
     const summary=vocab.querySelector(':scope > summary');
     if(summary){
       summary.style.setProperty('background','#ffffff','important');
       summary.style.setProperty('border-radius','12px','important');
       const heading=summary.querySelector('span');
-      if(heading)heading.style.setProperty('color','#7655a1','important');
+      if(heading)heading.style.setProperty('color','#775196','important');
       const arrow=summary.querySelectorAll('span')[2]||summary.lastElementChild;
-      if(arrow)arrow.style.setProperty('color','#9478b8','important');
+      if(arrow)arrow.style.setProperty('color','#9777b1','important');
       const hint=summary.querySelector('small');
-      if(hint)hint.style.setProperty('color','#8a79a7','important');
+      if(hint)hint.style.setProperty('color','#9780ad','important');
     }
   }
 });
