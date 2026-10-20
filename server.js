@@ -77,6 +77,8 @@ document.addEventListener('DOMContentLoaded',function(){
     summary.style.cssText='cursor:pointer;font-size:16px;font-weight:850';
     summary.textContent='🩵 出勤确认 / 출석 체크 · 点击展开申报缺勤';
     details.appendChild(summary);
+    const advance=document.getElementById('studentAbsenceCard');
+    if(advance)details.appendChild(advance);
     const heading=attendance.querySelector('h3');
     if(heading)heading.remove();
     while(top.nextSibling) details.appendChild(top.nextSibling);
