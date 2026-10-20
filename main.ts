@@ -140,17 +140,6 @@ async function handler(request: Request): Promise<Response> {
       if (/<(?:!doctype\s+html|html|body)(?:\s|>)/i.test(html)) {
       const uiPatch = `<script>
 document.addEventListener('DOMContentLoaded',function(){
-  // Move the records out of the study container BEFORE any folding logic runs.
-  try{
-    const study=document.querySelector('.studentTabbed'),records=document.getElementById('studentVocabPanel');
-    if(study&&records){
-      study.insertAdjacentElement('afterend',records);
-      records.hidden=false;
-      records.style.setProperty('display','block','important');
-    }
-  }catch(e){console.error('vocab relocation',e)}
-});
-document.addEventListener('DOMContentLoaded',function(){
   const attendance=document.querySelector('.studentAttendanceCard');
   try { if(attendance&&!attendance.dataset.compact){
     attendance.dataset.compact='1';
@@ -230,106 +219,7 @@ document.addEventListener('DOMContentLoaded',function(){
   if(count)count.remove();
   const homework=document.getElementById('studentVocabHomeworkCard');
   
-  const today=document.querySelector('.studentTabbed');
-  const vocab=document.getElementById('studentVocabPanel');
-  if(today&&!today.closest('#studentTodayFold')){
-    const fold=document.createElement('details');
-    fold.id='studentTodayFold';
-    fold.style.cssText='background:#fff;border:1px solid #d9e3ee;border-radius:16px;padding:15px;box-shadow:0 2px 8px rgba(32,53,77,.035);margin:0 0 12px';
-    const head=document.createElement('summary');
-    head.style.cssText='list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px;touch-action:manipulation';
-    const title=document.createElement('span');
-    title.style.cssText='font-size:17px;font-weight:850;color:#253449';
-    title.textContent='📚 今日学习';
-    const hint=document.createElement('span');
-    hint.style.cssText='font-size:12px;font-weight:550;color:#68788b';
-    hint.textContent='点击展开查看';
-    const arrow=document.createElement('span');
-    arrow.style.cssText='font-size:21px;color:#446b91';
-    arrow.textContent='⌄';
-    const right=document.createElement('span');
-    right.style.cssText='display:flex;align-items:center;gap:9px';
-    right.appendChild(hint);right.appendChild(arrow);
-    head.appendChild(title);head.appendChild(right);
-    fold.appendChild(head);
-    const originalHeader=today.querySelector(':scope > div > h3');
-    if(originalHeader&&originalHeader.textContent.includes('今日学习'))originalHeader.parentElement.remove();
-    today.style.setProperty('background','transparent','important');
-    today.style.setProperty('box-shadow','none','important');
-    today.style.setProperty('border','0','important');
-    today.style.setProperty('margin','12px 0 0','important');
-    today.style.setProperty('padding','0','important');
-    const parent=today.parentNode;
-    parent.insertBefore(fold,today);
-    fold.appendChild(today);
-    fold.addEventListener('toggle',()=>{hint.textContent=fold.open?'点击收起':'点击展开查看';arrow.textContent=fold.open?'⌃':'⌄'});
-    // Records are a sibling of the Today fold, not one of its contents.
-    if(vocab){fold.insertAdjacentElement('afterend',vocab);vocab.hidden=false;vocab.removeAttribute('open');vocab.style.removeProperty('display');}
-  }
-  // The two accordion cards must be siblings in a permanent standalone mount.
-  const todayFold=document.getElementById('studentTodayFold');
-  if(todayFold){
-    let slot=document.getElementById('standaloneVocabSlot');
-    if(!slot){
-      slot=document.createElement('div');
-      slot.id='standaloneVocabSlot';
-      slot.style.cssText='display:block;width:100%;margin:12px 0';
-      todayFold.insertAdjacentElement('afterend',slot);
-    }
-    const record=document.getElementById('studentVocabPanel');
-    if(record){
-      slot.appendChild(record);
-      record.hidden=false;
-      record.removeAttribute('open');
-      record.removeAttribute('aria-hidden');
-      record.style.setProperty('display','block','important');
-      record.style.setProperty('visibility','visible','important');
-      record.style.setProperty('margin','0','important');
-    }
-  }
-  // Anchor both accordion cards directly after attendance, outside all lesson/homework wrappers.
-  // This avoids malformed legacy nesting swallowing the vocabulary summary.
-  try {
-    const attendanceRoot=document.querySelector('.studentAttendanceCard');
-    const studyFold=document.getElementById('studentTodayFold');
-    const testFold=document.getElementById('studentVocabPanel');
-    if(attendanceRoot&&studyFold&&testFold){
-      let root=document.getElementById('studyRecordsRoot');
-      if(!root){
-        root=document.createElement('section');
-        root.id='studyRecordsRoot';
-        root.style.cssText='display:flex;flex-direction:column;gap:14px;width:100%;margin:18px 0';
-        attendanceRoot.insertAdjacentElement('afterend',root);
-      }
-      root.appendChild(studyFold);
-      root.appendChild(testFold);
-      studyFold.open=false;
-      testFold.open=false;
-      testFold.hidden=false;
-      testFold.style.setProperty('display','block','important');
-      const stale=document.getElementById('standaloneVocabSlot');
-      if(stale&&stale!==root)stale.remove();
-    }
-  } catch(err){console.error('independent study cards',err)}
-  // Style the closed header only; leave the expanded test records untouched.
-  if(vocab){
-    vocab.style.setProperty('background','#ffffff','important');
-    vocab.style.setProperty('border','1px solid #d9e3ee','important');
-    vocab.style.setProperty('border-radius','16px','important');
-    vocab.style.setProperty('padding','15px','important');
-    vocab.style.setProperty('box-shadow','0 2px 8px rgba(32,53,77,.035)','important');
-    const summary=vocab.querySelector(':scope > summary');
-    if(summary){
-      summary.style.setProperty('background','#ffffff','important');
-      summary.style.setProperty('border-radius','12px','important');
-      const heading=summary.querySelector('span');
-      if(heading)heading.style.setProperty('color','#253449','important');
-      const arrow=summary.querySelectorAll('span')[2]||summary.lastElementChild;
-      if(arrow)arrow.style.setProperty('color','#446b91','important');
-      const hint=summary.querySelector('small');
-      if(hint)hint.style.setProperty('color','#68788b','important');
-    }
-  }
+
 });
 </script>`;
       html = html.replaceAll("정상 출석이면 체크하지 않아도 돼요. / 正常出席无需操作", "正常出席无需操作").replaceAll("정상 출석이면 체크하지 않아도 돼요.", "正常出席无需操作");
