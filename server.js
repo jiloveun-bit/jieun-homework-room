@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded',function(){
   if(today&&vocab&&today.previousElementSibling!==vocab)today.parentNode.insertBefore(vocab,today);
 });
 </script>`;
-      if (/<\\/body\\s*>/i.test(html)) html = html.replace(/<\\/body\\s*>/i, uiPatch + '</body>'); else html += uiPatch;
+      html = html.replace('</body>', uiPatch + '</body>');
       bytes = Buffer.from(html, 'utf8');
     }
     res.setHeader('Content-Length', String(bytes.length));
