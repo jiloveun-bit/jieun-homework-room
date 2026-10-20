@@ -210,6 +210,19 @@ document.addEventListener('DOMContentLoaded',function(){
   const today=document.querySelector('.studentTabbed');
   const vocab=document.getElementById('studentVocabPanel');
   if(today&&vocab&&today.previousElementSibling!==vocab)today.parentNode.insertBefore(vocab,today);
+  // Make only the student's vocabulary test records visually distinct.
+  if(vocab){
+    vocab.style.setProperty('background','#ffffff','important');
+    vocab.style.setProperty('border','2px solid #ed9ab7','important');
+    vocab.style.setProperty('border-radius','18px','important');
+    vocab.style.setProperty('padding','18px','important');
+    vocab.style.setProperty('box-shadow','0 4px 18px rgba(191,68,113,.09)','important');
+    vocab.style.setProperty('color','#493746','important');
+    const headings=vocab.querySelectorAll('h2,h3,h4,.sectionTitle,.panelTitle');
+    headings.forEach(el=>{el.style.setProperty('color','#a82f63','important');el.style.setProperty('font-weight','800','important')});
+    vocab.querySelectorAll('.muted,small').forEach(el=>el.style.setProperty('color','#795b6d','important'));
+    vocab.querySelectorAll('strong,b').forEach(el=>el.style.setProperty('color','#8f2c58','important'));
+  }
 });
 </script>`;
       html = html.replaceAll("정상 출석이면 체크하지 않아도 돼요. / 正常出席无需操作", "正常出席无需操作").replaceAll("정상 출석이면 체크하지 않아도 돼요.", "正常出席无需操作");
