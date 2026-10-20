@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded',function(){
       title.textContent=active?timeLabel:(period==='pm'?'下午无课':'晚上无课');
       const label=document.createElement('div');
       label.style.cssText='font-size:12px;font-weight:750;letter-spacing:.6px;margin-bottom:5px;color:'+(active?'#446b91':'#8993a1');
-      label.textContent=period==='pm'?'AFTERNOON  ·  下午':'EVENING  ·  晚上';
+      label.textContent=period==='pm'?'下午':'晚上';
       card.appendChild(label);
       card.appendChild(title);
       const details=document.createElement('details');
@@ -212,6 +212,7 @@ document.addEventListener('DOMContentLoaded',function(){
   if(today&&vocab&&today.previousElementSibling!==vocab)today.parentNode.insertBefore(vocab,today);
 });
 </script>`;
+      html = html.replaceAll("정상 출석이면 체크하지 않아도 돼요. / 正常出席无需操作", "正常出席无需操作").replaceAll("정상 출석이면 체크하지 않아도 돼요.", "正常出席无需操作");
       html = /<\/body>/i.test(html) ? html.replace(/<\/body>/i, uiPatch + "</body>") : html + uiPatch;
       out.delete("content-length");
       return new Response(html, { status: upstream.status, headers: out });
