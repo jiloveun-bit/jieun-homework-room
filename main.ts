@@ -176,8 +176,8 @@ document.addEventListener('DOMContentLoaded',function(){
       card.appendChild(label);card.appendChild(heading);
       if(lesson){
         lesson.style.cssText='border:0!important;border-top:1px solid #e8edf3!important;border-radius:0!important;background:transparent!important;padding:14px 0 0!important;margin:0!important;box-shadow:none!important';
-        const duplicate=lesson.querySelector('.attendanceLessonTitle');
-        if(duplicate)duplicate.remove();
+        // Keep the actual class-time marker for matching, then hide every redundant inner heading.
+        lesson.querySelectorAll('.attendanceLessonTitle,.attendanceTime,.attendanceMiniLabel').forEach(el=>el.remove());
         const layout=lesson.querySelector('div[style*="grid-template-columns:1fr 1fr"]');
         if(layout){
           layout.style.cssText='display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;width:100%;align-items:start';
