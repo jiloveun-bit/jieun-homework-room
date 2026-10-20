@@ -209,7 +209,39 @@ document.addEventListener('DOMContentLoaded',function(){
   
   const today=document.querySelector('.studentTabbed');
   const vocab=document.getElementById('studentVocabPanel');
-  if(today&&vocab&&today.previousElementSibling!==vocab)today.parentNode.insertBefore(vocab,today);
+  if(today&&!today.closest('#studentTodayFold')){
+    const fold=document.createElement('details');
+    fold.id='studentTodayFold';
+    fold.style.cssText='background:#fff;border:1px solid #eac8d6;border-radius:16px;padding:15px;box-shadow:0 2px 8px rgba(177,57,105,.025);margin:0 0 12px';
+    const head=document.createElement('summary');
+    head.style.cssText='list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px;touch-action:manipulation';
+    const title=document.createElement('span');
+    title.style.cssText='font-size:17px;font-weight:850;color:#945875';
+    title.textContent='📚 今日学习';
+    const hint=document.createElement('span');
+    hint.style.cssText='font-size:12px;font-weight:550;color:#987e8a';
+    hint.textContent='点击展开查看';
+    const arrow=document.createElement('span');
+    arrow.style.cssText='font-size:21px;color:#a88093';
+    arrow.textContent='⌄';
+    const right=document.createElement('span');
+    right.style.cssText='display:flex;align-items:center;gap:9px';
+    right.appendChild(hint);right.appendChild(arrow);
+    head.appendChild(title);head.appendChild(right);
+    fold.appendChild(head);
+    const originalHeader=today.querySelector(':scope > div > h3');
+    if(originalHeader&&originalHeader.textContent.includes('今日学习'))originalHeader.parentElement.remove();
+    today.style.setProperty('background','transparent','important');
+    today.style.setProperty('box-shadow','none','important');
+    today.style.setProperty('border','0','important');
+    today.style.setProperty('margin','12px 0 0','important');
+    today.style.setProperty('padding','0','important');
+    const parent=today.parentNode;
+    parent.insertBefore(fold,today);
+    fold.appendChild(today);
+    fold.addEventListener('toggle',()=>{hint.textContent=fold.open?'点击收起':'点击展开查看';arrow.textContent=fold.open?'⌃':'⌄'});
+    if(vocab)fold.insertAdjacentElement('afterend',vocab);
+  }
   // Style the closed header only; leave the expanded test records untouched.
   if(vocab){
     vocab.style.setProperty('background','#ffffff','important');
