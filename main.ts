@@ -287,6 +287,30 @@ document.addEventListener('DOMContentLoaded',function(){
       record.style.setProperty('margin','0','important');
     }
   }
+  // Anchor both accordion cards directly after attendance, outside all lesson/homework wrappers.
+  // This avoids malformed legacy nesting swallowing the vocabulary summary.
+  try {
+    const attendanceRoot=document.querySelector('.studentAttendanceCard');
+    const studyFold=document.getElementById('studentTodayFold');
+    const testFold=document.getElementById('studentVocabPanel');
+    if(attendanceRoot&&studyFold&&testFold){
+      let root=document.getElementById('studyRecordsRoot');
+      if(!root){
+        root=document.createElement('section');
+        root.id='studyRecordsRoot';
+        root.style.cssText='display:flex;flex-direction:column;gap:14px;width:100%;margin:18px 0';
+        attendanceRoot.insertAdjacentElement('afterend',root);
+      }
+      root.appendChild(studyFold);
+      root.appendChild(testFold);
+      studyFold.open=false;
+      testFold.open=false;
+      testFold.hidden=false;
+      testFold.style.setProperty('display','block','important');
+      const stale=document.getElementById('standaloneVocabSlot');
+      if(stale&&stale!==root)stale.remove();
+    }
+  } catch(err){console.error('independent study cards',err)}
   // Style the closed header only; leave the expanded test records untouched.
   if(vocab){
     vocab.style.setProperty('background','#ffffff','important');
