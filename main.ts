@@ -152,35 +152,40 @@ document.addEventListener('DOMContentLoaded',function(){
     const advance=document.getElementById('studentAbsenceCard');
     if(advance)advance.remove();
     const wrapper=document.createElement('div');
-    wrapper.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:12px;margin-bottom:12px';
+    wrapper.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px;margin:4px 0 14px';
     const existing=document.createElement('div');
     while(attendance.firstChild)existing.appendChild(attendance.firstChild);
     const buildSlot=(period,active,timeLabel)=>{
       const card=document.createElement('div');
-      card.style.cssText='background:#fff5c4;border:1px solid #f4de88;border-radius:14px;padding:12px 14px;color:#745500';
+      card.style.cssText='background:'+(active?'#ffffff':'#f8fafc')+';border:1px solid '+(active?'#d8e3ef':'#e5e9ef')+';border-radius:18px;padding:18px;color:#253449;box-shadow:0 3px 15px rgba(32,53,77,.035);min-width:0';
       const title=document.createElement('div');
-      title.style.cssText='font-size:16px;font-weight:850;margin-bottom:10px';
-      title.textContent=active?'🕒 '+timeLabel:(period==='pm'?'☀️ 下午无课':'🌙 晚上无课');
+      title.style.cssText='font-size:20px;letter-spacing:-.35px;font-weight:800;margin-bottom:14px;line-height:1.45';
+      title.textContent=active?timeLabel:(period==='pm'?'下午无课':'晚上无课');
+      const label=document.createElement('div');
+      label.style.cssText='font-size:12px;font-weight:750;letter-spacing:.6px;margin-bottom:5px;color:'+(active?'#446b91':'#8993a1');
+      label.textContent=period==='pm'?'AFTERNOON  ·  下午':'EVENING  ·  晚上';
+      card.appendChild(label);
       card.appendChild(title);
       const details=document.createElement('details');
-      details.style.cssText='border-top:1px solid #e7d88d;padding-top:9px';
+      details.style.cssText='border-top:1px solid #e8edf3;padding-top:12px';
       const summary=document.createElement('summary');
-      summary.style.cssText='cursor:pointer;font-size:14px;font-weight:750;line-height:1.55';
-      summary.textContent='请假或缺席的同学，请展开这里 / 결석하는 학생은 여기를 펼쳐 주세요';
+      summary.style.cssText='cursor:pointer;font-size:13px;font-weight:650;line-height:1.6;color:#426587;padding:2px 0;touch-action:manipulation';
+      summary.textContent='请假或缺席的同学，请点击展开';
       details.appendChild(summary);
       if(!active){
         details.removeAttribute('open');
         const msg=document.createElement('div');
-        msg.style.cssText='font-size:13px;margin-top:8px';
-        msg.textContent='今天没有这节课 / 오늘은 이 수업이 없습니다';
+        msg.style.cssText='font-size:12px;color:#7c8795;margin-top:9px';
+        msg.textContent='今天没有这节课';
         details.appendChild(msg);
       }
       card.appendChild(details);
       wrapper.appendChild(card);
       return details;
     };
-    const afternoon=buildSlot('pm',hasAfternoon,'13:30 下午课');
-    const evening=buildSlot('eve',hasEvening,'18:30 晚课');
+    attendance.style.cssText='border:1px solid #edf1f5;border-radius:20px;background:#fff;padding:16px;box-shadow:0 5px 20px rgba(28,45,66,.035)';
+    const afternoon=buildSlot('pm',hasAfternoon,'13:30 · 下午课');
+    const evening=buildSlot('eve',hasEvening,'18:30 · 晚课');
     // Keep the existing attendance tools intact; never clone forms or break event listeners.
     if(hasAfternoon&&!hasEvening)afternoon.appendChild(existing);
     else if(hasEvening&&!hasAfternoon)evening.appendChild(existing);
