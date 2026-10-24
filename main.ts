@@ -138,7 +138,7 @@ async function handler(request: Request): Promise<Response> {
     if (!isFileDownload && upstream.status === 200 && request.method === "GET") {
       let html = await upstream.text();
       if (/<(?:!doctype\s+html|html|body)(?:\s|>)/i.test(html)) {
-      const uiPatch = \`<style>
+      const uiPatch = `<style>
 /* Unified student classroom: short attendance row and polished compact study cards */
 body:has(.jhAttendanceGrid) .studentAttendanceCard{
   border:0!important;background:transparent!important;padding:0!important;
@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded',function(){
   // Keep advance leave functionality and other page content intact.
  }catch(err){console.error('compact attendance layout:',err);}
 });
-</script>\`;
+</script>`;
       html = html.replaceAll("정상 출석이면 체크하지 않아도 돼요. / 正常出席无需操作", "正常出席无需操作").replaceAll("정상 출석이면 체크하지 않아도 돼요.", "正常出席无需操作");
       html = html.replaceAll("이미 입력된 테스트입니다. 수정하시겠습니까?", "该学生的本次考试成绩已录入，确定要修改吗？");
       html = /<\/body>/i.test(html) ? html.replace(/<\/body>/i, uiPatch + "</body>") : html + uiPatch;
