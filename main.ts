@@ -138,90 +138,121 @@ async function handler(request: Request): Promise<Response> {
     if (!isFileDownload && upstream.status === 200 && request.method === "GET") {
       let html = await upstream.text();
       if (/<(?:!doctype\s+html|html|body)(?:\s|>)/i.test(html)) {
-      const uiPatch = `<script>
+      const uiPatch = \`<style>
+/* Unified student classroom: short attendance row and polished compact study cards */
+body:has(.jhAttendanceGrid) .studentAttendanceCard{
+  border:0!important;background:transparent!important;padding:0!important;
+  box-shadow:none!important;margin:8px 0 10px!important;
+}
+.jhAttendanceHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 10px;padding:0 2px}
+.jhAttendanceHeader strong{color:#3e5577;font-size:15px;font-weight:830;line-height:1.4}
+.jhAttendanceHeader small{display:block;margin-top:3px;color:#8699b0;font-size:11px}
+.jhNoClassNote{display:inline-flex;gap:6px;align-items:center;color:#8093a9;background:#f4f6fc;border:1px solid #dfe7f1;border-radius:8px;padding:6px 9px;font-size:11px}
+.jhAttendanceGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,355px),1fr));gap:11px;align-items:start}
+.jhAttendanceSlot{padding:13px 15px;border:1px solid #dbe5f1;border-radius:13px;background:#fff;box-shadow:0 3px 13px rgba(60,82,125,.04);min-width:0}
+.jhAttendanceSlotHeader{display:flex;gap:9px;align-items:center;padding:0 0 9px;border-bottom:1px solid #e8edf5;margin-bottom:7px}
+.jhAttendanceIcon{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:#e9ecfb;color:#6876a7;font-weight:860;font-size:11px;flex-shrink:0}
+.jhAttendanceSlotHeader strong{display:block;font-size:13px;color:#3c597a;line-height:1.4}
+.jhAttendanceSlotHeader small{display:block;font-size:10px;color:#96a5b5;line-height:1.4;margin-top:1px}
+.jhAttendanceGrid .attendanceLesson{border:0!important;background:transparent!important;padding:0!important;margin:0!important;box-shadow:none!important}
+.jhAttendanceGrid .attendanceLesson+.attendanceLesson{margin-top:10px!important;padding-top:10px!important;border-top:1px dashed #dbe4ee!important}
+.jhAttendanceGrid .attendanceLessonTitle{display:none!important}
+.jhAttendanceGrid .attendanceLesson .attendanceSelector{margin:5px 0 0!important;width:100%!important;min-width:0!important}
+.jhAttendanceGrid .attendanceButtons{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;align-items:stretch!important}
+.jhAttendanceGrid .attendanceButtons>button,.jhAttendanceGrid .attendanceButtons button{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ box-sizing:border-box!important;min-height:41px!important;height:41px!important;
+ margin:0!important;padding:6px 9px!important;border-radius:9px!important;
+ font-size:12px!important;font-weight:780!important;line-height:1.3!important;min-width:0!important;
+}
+.jhAttendanceGrid .attendancePostForm{
+ margin:9px 0 0!important;padding:10px 11px!important;
+ border:1px solid #dbe6f0!important;background:#f8faff!important;border-radius:10px!important;
+}
+.jhAttendanceGrid .attendancePostForm textarea{min-height:70px!important;font-size:12px!important}
+.jhAttendanceGrid .attendancePostForm button{min-height:37px!important;border-radius:8px!important;font-size:12px!important}
+.jhAttendanceGrid .majorClash{margin:7px 0!important;padding:11px 12px!important;border:1px solid #dbe5ef!important;background:#f5f8fc!important;border-radius:10px!important;font-size:12px!important}
+.jhAttendanceGrid .majorClash>div{font-size:12px!important;line-height:1.6!important}
+.jhAttendanceGrid .majorClash button{min-height:36px!important;font-size:11px!important;padding:6px 8px!important;border-radius:8px!important}
+.jhAttendanceNote{display:flex;align-items:center;gap:6px;color:#8495a9;font-size:10.5px;line-height:1.6;padding:9px 2px 0}
+body:has(.studentCompactHero) #studentTodayFold{
+ background:#fff!important;border:1px solid #dce5f0!important;border-radius:13px!important;padding:11px 12px!important;
+ box-shadow:0 3px 12px rgba(60,83,130,.04)!important;margin:11px 0!important}
+body:has(.studentCompactHero) #studentTodayFold>summary{
+ background:linear-gradient(90deg,#e9ecfc,#f1f8fd)!important;color:#496486!important;
+ font-size:13px!important;padding:9px 11px!important;border-radius:9px!important;
+}
+body:has(.studentCompactHero) #studentTodayFold .studentTabbed{margin-top:8px!important}
+body:has(.studentCompactHero) #studentTodayFold .studentTabbed>.card,
+body:has(.studentCompactHero) #studentTodayFold .card{
+ padding:10px 12px!important;margin:7px 0!important;border-radius:10px!important;
+ background:#fff!important;border-color:#dce6f2!important;box-shadow:none!important}
+body:has(.studentCompactHero) #studentTodayFold .lessonGroup,
+body:has(.studentCompactHero) #studentTodayFold .polishedLesson{
+ padding:9px 11px!important;margin:8px 0 0!important;border:1px solid #e2e9f5!important;
+ border-radius:9px!important;background:#fff!important}
+body:has(.studentCompactHero) #studentTodayFold .lessonGroupTitle{font-size:12px!important;font-weight:780!important;color:#54708e!important;margin:0 0 5px!important}
+body:has(.studentCompactHero) #studentTodayFold .item{padding:6px 2px!important;font-size:12.5px!important;line-height:1.5!important}
+body:has(.studentCompactHero) #studentTodayFold .item b{font-size:12.5px!important}
+body:has(.studentCompactHero) #studentTodayFold .itemNum{width:22px!important;min-width:22px!important;height:22px!important;border-radius:7px!important;font-size:12px!important}
+body:has(.studentCompactHero) #studentTodayFold .hwContent{font-size:12px!important;line-height:1.55!important}
+body:has(.studentCompactHero) #studentVocabPanel{border-color:#dce5f0!important;background:#fff!important;border-radius:12px!important}
+@media(max-width:610px){
+ .jhAttendanceGrid{grid-template-columns:minmax(0,1fr)}
+ .jhAttendanceSlot{padding:11px 12px}
+ .jhAttendanceHeader strong{font-size:14px}
+ .jhAttendanceGrid .attendanceButtons>button,.jhAttendanceGrid .attendanceButtons button{font-size:11.5px!important}
+ body:has(.studentCompactHero) #studentTodayFold .card{padding:9px!important}
+}
+</style><script>
 document.addEventListener('DOMContentLoaded',function(){
-  const attendance=document.querySelector('.studentAttendanceCard');
-  try { if(attendance&&!attendance.dataset.compact){
-    attendance.dataset.compact='1';
-    const lessons=[...attendance.querySelectorAll('.attendanceLesson')];
-    const intro=attendance.querySelector('.attendanceIntro');
-    if(intro)intro.remove();
-    const oldHeading=attendance.querySelector('h3');
-    if(oldHeading)oldHeading.remove();
-    const advance=document.getElementById('studentAbsenceCard');
-    if(advance)advance.remove();
-    const wrapper=document.createElement('div');
-    wrapper.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px;align-items:stretch';
-    const buildSlot=(period,time)=>{
-      const lesson=lessons.find(el=>(el.querySelector('.attendanceTime')?.textContent||'').includes(time));
-      const card=document.createElement('section');
-      card.style.cssText='background:#fff;border:1px solid #d9e3ee;border-radius:18px;padding:18px;min-width:0;display:flex;flex-direction:column;gap:8px';
-      const label=document.createElement('div');
-      label.style.cssText='font-size:13px;font-weight:750;color:#446b91';
-      label.textContent=period==='pm'?'下午':'晚上';
-      const heading=document.createElement('div');
-      heading.style.cssText='font-size:22px;font-weight:800;line-height:1.4;color:#253449;margin:0 0 9px';
-      heading.textContent=lesson?(time+' · '+(period==='pm'?'下午课':'晚课')):(period==='pm'?'下午无课':'晚上无课');
-      card.appendChild(label);card.appendChild(heading);
-      if(lesson){
-        lesson.style.cssText='border:0!important;border-top:1px solid #e8edf3!important;border-radius:0!important;background:transparent!important;padding:14px 0 0!important;margin:0!important;box-shadow:none!important';
-        // Keep the actual class-time marker for matching, then hide every redundant inner heading.
-        lesson.querySelectorAll('.attendanceLessonTitle,.attendanceTime,.attendanceMiniLabel').forEach(el=>el.remove());
-        const layout=lesson.querySelector('div[style*="grid-template-columns:1fr 1fr"]');
-        if(layout){
-          layout.style.cssText='display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;width:100%;align-items:start';
-          const present=layout.querySelector(':scope > form');
-          const absent=layout.querySelector(':scope > details');
-          if(present){
-            present.style.cssText='margin:0;min-width:0;display:flex;align-items:stretch;width:100%;height:52px';
-            const btn=present.querySelector('button');
-            if(btn)btn.style.cssText+=';box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:52px!important;min-height:52px!important;margin:0!important;padding:8px 4px!important;line-height:1.2!important;white-space:nowrap!important';
-          }
-          if(absent){
-            absent.style.cssText='grid-column:2;min-width:0;margin:0;width:100%;height:52px;display:block;border:0!important';
-            const summary=absent.querySelector('summary');
-            if(summary)summary.style.cssText+=';box-sizing:border-box!important;display:flex!important;justify-content:center!important;align-items:center!important;width:100%!important;height:52px!important;min-height:52px!important;margin:0!important;padding:8px 4px!important;line-height:1.2!important;white-space:nowrap!important';
-            const reasonForm=absent.querySelector('form');
-            if(reasonForm){
-              reasonForm.style.cssText='grid-column:1 / -1;box-sizing:border-box;width:100%;min-width:0;margin:0;padding:14px;background:#f8fafc;border:1px solid #e3e9ee;border-radius:12px;display:none';
-              layout.appendChild(reasonForm);
-              const toggle=()=>{reasonForm.style.display=absent.open?'block':'none'};
-              absent.addEventListener('toggle',toggle);
-              toggle();
-              const text=reasonForm.querySelector('textarea');
-              if(text)text.style.cssText='box-sizing:border-box;width:100%;min-width:0;min-height:90px;display:block';
-              const pb=present?.querySelector('button');
-              if(pb)pb.addEventListener('click',()=>{absent.open=false;reasonForm.style.display='none'},true);
-            }
-          }
-        }
-        if(lesson.querySelector('.majorClash')){
-          // A conflicting class uses the special attendance confirmation controls only.
-          // Do not render a second contradictory default attendance choice.
-          const selector=lesson.querySelector('div[style*="grid-template-columns:1fr 1fr"]');
-          if(selector)selector.style.setProperty('display','none','important');
-        }
-        card.appendChild(lesson);
-      }
-      wrapper.appendChild(card);
-    };
-    buildSlot('pm','13:30');
-    buildSlot('eve','18:30');
-    attendance.querySelectorAll('.attendanceLesson').forEach(el=>el.remove());
-    attendance.replaceChildren(wrapper);
-    attendance.style.cssText='border:0;background:transparent;padding:0;box-shadow:none';
-    const note=document.createElement('div');
-    note.style.cssText='font-size:12px;color:#68788b;line-height:1.55;padding:10px 3px 2px';
-    note.textContent='ⓘ 课程开始10分钟后不可修改出勤状态。';
-    attendance.appendChild(note);
-  }}catch(e){console.error('attendance layout',e)}
-  const count=document.getElementById('studentAbsenceCount');
-  if(count)count.remove();
-  const homework=document.getElementById('studentVocabHomeworkCard');
-  
-
+ const attendance=document.querySelector('.studentAttendanceCard');
+ if(!attendance||attendance.dataset.compact==='2026-refined')return;
+ try{
+  const lessons=[...attendance.querySelectorAll('.attendanceLesson')];
+  if(!lessons.length)return;
+  attendance.dataset.compact='2026-refined';
+  const header=document.createElement('div');header.className='jhAttendanceHeader';
+  const head=document.createElement('div');head.innerHTML='<strong>出勤确认</strong><small>课堂出席与缺席 · 简洁记录</small>';
+  header.appendChild(head);
+  const slotRows=[
+   {period:'afternoon',label:'下午课',badge:'午',times:lessons.filter(el=>Number((el.querySelector('.attendanceTime')?.textContent||'').slice(0,2))<18)},
+   {period:'evening',label:'晚课',badge:'晚',times:lessons.filter(el=>Number((el.querySelector('.attendanceTime')?.textContent||'').slice(0,2))>=18)}
+  ];
+  const empty=slotRows.filter(row=>row.times.length===0).map(row=>row.label+'暂无课程');
+  if(empty.length){
+    const chip=document.createElement('span');chip.className='jhNoClassNote';chip.textContent=empty.join(' · ');
+    header.appendChild(chip);
+  }
+  const grid=document.createElement('div');grid.className='jhAttendanceGrid';
+  for(const row of slotRows){
+   if(!row.times.length)continue;
+   const card=document.createElement('section');card.className='jhAttendanceSlot';
+   const label=document.createElement('div');label.className='jhAttendanceSlotHeader';
+   const icon=document.createElement('span');icon.className='jhAttendanceIcon';icon.textContent=row.badge;
+   const caption=document.createElement('div');
+   caption.innerHTML='<strong>'+row.label+'</strong><small>'+row.times.map(el=>(el.querySelector('.attendanceTime')?.textContent||'').replace('课程','').trim()).join(' · ')+' · 出勤记录</small>';
+   label.appendChild(icon);label.appendChild(caption);card.appendChild(label);
+   for(const lesson of row.times){
+    // Move full forms without rebuilding any action or changing event handlers.
+    lesson.querySelector('.attendanceLessonTitle')?.remove();
+    const notice=lesson.querySelector('div[style*="默认已选择出席"]');
+    if(notice)notice.remove();
+    if(lesson.querySelector('.majorClash')){
+      const selector=lesson.querySelector('.attendanceSelector');
+      if(selector)selector.style.setProperty('display','none','important');
+    }
+    card.appendChild(lesson);
+   }
+   grid.appendChild(card);
+  }
+  const foot=document.createElement('div');foot.className='jhAttendanceNote';
+  foot.textContent='ⓘ 上课开始10分钟后不可修改出勤状态。';
+  attendance.replaceChildren(header,grid,foot);
+  // Keep advance leave functionality and other page content intact.
+ }catch(err){console.error('compact attendance layout:',err);}
 });
-</script>`;
+</script>\`;
       html = html.replaceAll("정상 출석이면 체크하지 않아도 돼요. / 正常出席无需操作", "正常出席无需操作").replaceAll("정상 출석이면 체크하지 않아도 돼요.", "正常出席无需操作");
       html = html.replaceAll("이미 입력된 테스트입니다. 수정하시겠습니까?", "该学生的本次考试成绩已录入，确定要修改吗？");
       html = /<\/body>/i.test(html) ? html.replace(/<\/body>/i, uiPatch + "</body>") : html + uiPatch;
