@@ -123,7 +123,7 @@ async function handler(request: Request): Promise<Response> {
       out.set("content-transfer-encoding", "binary");
       out.set("x-download-options", "noopen");
     } else {
-      out.set("content-type", "text/html; charset=UTF-8");
+      out.set("content-type", upstream.headers.get("content-type") || "text/html; charset=UTF-8");
     }
 
     out.set(
@@ -135,7 +135,7 @@ async function handler(request: Request): Promise<Response> {
     out.set("x-jieun-proxy-version", "2026-10-08-v8");
 
     // Apply the same attendance layout to the actual Deno-operated student site.
-    if (!isFileDownload && upstream.status === 200 && request.method === "GET") {
+    if (!isFileDownload && upstream.status === 200 && request.method === "GET" && /text\/html/i.test(out.get("content-type") || "")) {
       let html = await upstream.text();
       if (/<(?:!doctype\s+html|html|body)(?:\s|>)/i.test(html)) {
       const uiPatch = `<style>
@@ -282,3 +282,4 @@ document.addEventListener('DOMContentLoaded',function(){
 }
 
 Deno.serve(handler);
+
