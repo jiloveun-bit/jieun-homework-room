@@ -135,9 +135,13 @@ async function handler(request: Request): Promise<Response> {
     out.set("x-jieun-proxy-version", "2026-10-08-v8");
 
     // Apply the same attendance layout to the actual Deno-operated student site.
-    if (!isFileDownload && upstream.status === 200 && request.method === "GET" && /text\/html/i.test(out.get("content-type") || "")) {
+    if (!isFileDownload && request.method !== "HEAD" && ![204, 205, 304].includes(upstream.status)) {
       let html = await upstream.text();
-      if (/<(?:!doctype\s+html|html|body)(?:\s|>)/i.test(html)) {
+      // Edge Functions can downgrade HTML to text/plain. Restore document MIME
+      // from the payload while preserving JSON and plain-text API responses.
+      const isHtmlDocument = /<(?:!doctype\s+html|html|body)(?:\s|>)/i.test(html);
+      if (isHtmlDocument) out.set("content-type", "text/html; charset=UTF-8");
+      if (isHtmlDocument && upstream.status === 200 && request.method === "GET") {
       const uiPatch = `<style>
 /* Unified student classroom: short attendance row and polished compact study cards */
 body:has(.jhAttendanceGrid) .studentAttendanceCard{
